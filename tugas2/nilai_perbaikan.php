@@ -44,13 +44,13 @@
 		<?php 
 		include 'koneksi.php';
 		if($_GET['role'] == "admin"){
-			$query = "SELECT * FROM mahasiswa";
+			$query = "SELECT * FROM nilai_perbaikan";
 		}else if($_GET['role']=="dosen"){
-			$query = "select * from mahasiswa limit 10";
+			$query = "select * from nilai_perbaikan limit 10";
 		}
 		$no = 1;
 		$connection = new connection();
-		$data = $connection->koneksi()->query("select * from nilai_perbaikan") ;
+		$data = $connection->koneksi()->query("$query") ;
 		foreach($data as $d){
 			?>
 			<tr>
