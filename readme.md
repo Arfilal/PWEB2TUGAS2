@@ -37,100 +37,119 @@ Tables
 
 membuat koneksi untuk menghubungkan database
 
+## Kelas-kelas
 
-# Fitur
+### connection
 
-Manajemen koneksi database
+Kelas ini menangani koneksi database.
 
+```php
+class connection {
+    private $servername = "localhost";
+    private $username = "root";
+    private $password = "";
+    private $dbname = "pwebtugas2";
 
-Kelas abstrak untuk operasi database umum
+    public function koneksi() {
+        $db = new mysqli($this->servername, $this->username, $this->password, $this->dbname);
+        return $db;
+    }
+}
+```
 
+### operasi
 
-Kontrol akses berbasis peran (Dosen dan Admin)
+Kelas abstrak yang memperluas `connection` dan menyediakan metode untuk memilih semua catatan dari sebuah tabel.
 
+```php
+abstract class operasi extends connection {
+    public function selectall($tabel) {
+        $querry = "select * from $tabel";
+        return parent::__construct()->querry($querry);
+    }
 
-Menampilkan informasi mahasiswa berdasarkan peran pengguna
+    abstract function tblmahasiswa();
+}
+```
 
-## Fitur
+### dosen
 
-- Manajemen koneksi database
-- Kelas abstrak untuk operasi database umum
-- Kontrol akses berbasis peran (Dosen dan Admin)
-- Menampilkan informasi mahasiswa berdasarkan peran pengguna
+Memperluas `operasi` untuk menampilkan data mahasiswa dalam format tabel.
 
-# Instalasi
+### admin
 
-Clone repositori ini ke mesin lokal Anda atau unduh file koneksi.php.
+Memperluas `operasi` untuk menampilkan data mahasiswa dengan kolom "Edit" tambahan.
 
+## Pewarisan dan Polimorfisme
 
-Letakkan file tersebut di root dokumen web server Anda atau direktori proyek yang diinginkan.
+### Pewarisan (Inheritance)
 
+1. Kelas `operasi` memperluas kelas `connection`:
+   ```php
+   abstract class operasi extends connection
+   ```
+   Ini memungkinkan `operasi` untuk mewarisi fungsionalitas koneksi database dari `connection`.
 
-Buat database MySQL bernama pwebtugas2.
+2. Kedua kelas `dosen` dan `admin` memperluas kelas `operasi`:
+   ```php
+   class dosen extends operasi
+   class admin extends operasi
+   ```
+   Ini memungkinkan mereka untuk mewarisi metode dari `operasi`, seperti `selectall()`.
 
+### Polimorfisme (Polymorphism)
 
-Impor tabel yang diperlukan (misalnya mahasiswa) ke dalam database.
+1. Kelas `operasi` mendeklarasikan metode abstrak `tblmahasiswa()`:
+   ```php
+   abstract function tblmahasiswa();
+   ```
 
+2. Kedua kelas `dosen` dan `admin` mengimplementasikan versi mereka sendiri dari `tblmahasiswa()`:
+   ```php
+   class dosen extends operasi {
+       public function tblmahasiswa() {
+           // Implementasi untuk dosen
+       }
+   }
+
+   class admin extends operasi {
+       public function tblmahasiswa() {
+           // Implementasi untuk admin
+       }
+   }
+   ```
+   Ini menunjukkan polimorfisme, karena nama metode yang sama digunakan tetapi dengan implementasi berbeda di setiap kelas turunan.
 
 ## Penggunaan
 
-1. Sertakan file `koneksi.php` dalam skrip PHP:
+Untuk menggunakan skrip ini,biasanya akan:
 
+1. Menyertakan file dalam skrip PHP.
+2. Membuat instance dari kelas `dosen` atau `admin`.
+3. Memanggil metode `tblmahasiswa()` untuk menampilkan data mahasiswa.
+
+Contoh:
 ```php
-require_once 'koneksi.php';
-```
+include 'koneksi.php';
 
-2. Buat instance dari kelas yang diinginkan berdasarkan peran pengguna:
-
-```php
-// Untuk peran Dosen
 $dosen = new dosen();
 $dosen->tblmahasiswa();
 
-// Untuk peran Admin
+// Atau untuk tampilan admin
 $admin = new admin();
 $admin->tblmahasiswa();
 ```
 
-3. Metode `tblmahasiswa()` akan menghasilkan tabel HTML dengan informasi mahasiswa berdasarkan peran pengguna.
+## Konfigurasi Database
 
-## Struktur Kelas
+Koneksi database dikonfigurasi dalam kelas `connection`. Ubah properti berikut agar sesuai dengan pengaturan database:
 
-### `connection`
-
-Kelas ini menangani koneksi database.
-
-- Properti:
-  - `$servername`: Nama server MySQL (default: "localhost")
-  - `$username`: Nama pengguna MySQL (default: "root")
-  - `$password`: Kata sandi MySQL (default: "")
-  - `$dbname`: Nama database (default: "pwebtugas2")
-
-- Metode:
-  - `koneksi()`: Membuat dan mengembalikan koneksi database
-
-### `operasi` (kelas abstrak)
-
-Kelas abstrak ini memperluas `connection` dan menyediakan operasi database umum.
-
-- Metode:
-  - `selectall($tabel)`: Mengambil semua catatan dari tabel yang ditentukan
-  - `tblmahasiswa()`: Metode abstrak yang akan diimplementasikan oleh kelas turunan
-
-### `dosen` (memperluas `operasi`)
-
-Kelas ini merepresentasikan peran Dosen.
-
-- Metode:
-  - `tblmahasiswa()`: Menampilkan informasi mahasiswa tanpa opsi edit
-
-### `admin` (memperluas `operasi`)
-
-Kelas ini merepresentasikan peran Admin.
-
-- Metode:
-  - `tblmahasiswa()`: Menampilkan informasi mahasiswa dengan opsi edit
-  
+```php
+private $servername = "localhost";
+private $username = "root";
+private $password = "";
+private $dbname = "pwebtugas2";
+```
 
 # 2. membuat tabel mahasiswa
 
